@@ -11,97 +11,100 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-var array = [];
-var amount;
+const array = [];
 
 
-const manQuestion = (answers) => {
-    var number;
-    inquirer.prompt([
-        {
-            type: 'input',
-            message: "Please enter Manager's office number",
-            name: 'number',
-        },
-    ]).then((manager) => { number = manager.number; return number})
-    .catch(error => {
-        if(error.isTtyError) {
-          console.log(error)
-        } else {
-            // Something else when wrong
-            console.log(error)
-        }
-      });
+// const managerQuestion = (answers) => {
+//     var number;
+//     inquirer.prompt([
+//         {
+//             type: 'input',
+//             message: "Please enter Manager's office number",
+//             name: 'number',
+//         },
+//     ]).then((manager) => { number = manager.number; return number})
+//     .catch(error => {
+//         if(error.isTtyError) {
+//           console.log(error)
+//         } else {
+//             // Something else when wrong
+//             console.log(error)
+//         }
+//       });
 
-    var Man = new Manager(answers.name, answers.role, answers.id, answers.email, number);
-    array.push(Man);
-    console.log("Current Employee Array: " + array)
-}
+//     var Man = new Manager(answers.name, answers.role, answers.id, answers.email, number);
+//     array.push(Man);
+//     console.log("Current Employee Array: " + array)
+// }
 
-const engQuestion = (answers) => {
-    inquirer.prompt([
-        {
-            type: 'input',
-            message: "Please enter the Engineer's github username",
-            name: 'github',
-        }
-    ]).then((engineer) => { return github = engineer.github})
-    .catch(error => {
-        if(error.isTtyError) {
-          console.log(error)
-        } else {
-            // Something else when wrong
-            console.log(error)
-        }
-      });
+// const engineerQuestion = (answers) => {
+//     inquirer.prompt([
+//         {
+//             type: 'input',
+//             message: "Please enter the Engineer's github username",
+//             name: 'github',
+//         }
+//     ]).then((engineer) => { return github = engineer.github})
+//     .catch(error => {
+//         if(error.isTtyError) {
+//           console.log(error)
+//         } else {
+//             // Something else when wrong
+//             console.log(error)
+//         }
+//       });
 
-    var Eng = new Engineer(answers.name, answers.role, answers.id, answers.email, github);
-    array.push(Eng);
-    console.log("Current Employee Array: " + array)
-}
+//     var Eng = new Engineer(answers.name, answers.role, answers.id, answers.email, github);
+//     array.push(Eng);
+//     console.log("Current Employee Array: " + array)
+// }
 
-const intQuestion = (answers) => {
+const internQuestion = function(){
     inquirer.prompt([
         {
             type: 'input',
             message: "Please enter the Intern's School",
             name: 'school'
         }
-    ]).then((intern) => { return school = intern.school})
-    .catch(error => {
-        if(error.isTtyError) {
-          console.log(error)
-        } else {
-            // Something else when wrong
-            console.log(error)
-        }
-      });
-
-
-    var Int = new Intern(answers.name, answers.role, answers.id, answers.email, school);
-    console.log("New Intern added: " + JSON.stringify(Int))
-    array.push(Int);
-    console.log("Current Employee Array: " + array)
+    ]).then((answers) => { 
+        console.log("Intern Answer: " + answers.school)
+        return answers.school
+    })
 }
 
-const ask = function(){
+function askQuestion(){
     inquirer.prompt(question)
     .then((answers) => {
         if(answers.role === "manager"){
-            manQuestion(answers)
+            return managerQuestion(answers)
         }else if
         (answers.role === "engineer"){
-            engQuestion(answers)
+            engineerQuestion(answers)
         }else if
         (answers.role === "intern"){
-            intQuestion(answers)
+            internQuestion(answers);
         }
+
+        console.log(answers)
+        array.push(answers)
+        console.log("Current roster: " + JSON.stringify(array)) 
         
-        // finalize(answers);
+        
+        if(answers.finalize){
+            askQuestion()
+        }else return
+    })
+    .then((answers) => {
+
+        console.log(answers)
+        var Int = new Intern(answers.name, answers.role, answers.id, answers.email, answers.school);
+        console.log("New Intern added: " + JSON.stringify(Int))
+        array.push(Int);
 
         console.log("Current Employee Array: " + array)
-    
-    })}
+    })
+
+}
 
 
 // const finalize = function(answers){
@@ -112,7 +115,7 @@ const ask = function(){
 // }
 
 // finalize();
-ask()
+askQuestion()
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
